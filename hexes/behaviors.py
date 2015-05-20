@@ -3,6 +3,13 @@ import asyncio
 
 @asyncio.coroutine
 def render(app):
+    """
+    The core rendering loop.
+
+    Do not schedule this with ``app.on``; it is scheduled automatically when
+    you start the application.
+    """
+
     if app.root.dirty:
         app.log("Rendering")
         app.stdscr.refresh()
@@ -16,9 +23,21 @@ def render(app):
     # I'd love the idea of "repeat this indefinitely" to be expressed in the
     # decorator used, but that might deny the ability to key it off particular
     # logic?
-    app.loop.create_task(render(app))
+    app.schedule(render)
 
 
 @asyncio.coroutine
 def quit(app):
+    """
+    Basic quitting behavior.
+
+    Typically, you'll want to schedule this with:
+
+    .. code-block:: python
+
+        app.on('q', quit)
+
+    or something similar.
+    """
+
     app.loop.stop()
